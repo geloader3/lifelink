@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../Common Widgets/constants.dart';
+import '../../../../Common Widgets/constants.dart';
 import '../../Controllers/announcement_controller.dart';
 
 class AnnouncementsScreen extends StatefulWidget {
