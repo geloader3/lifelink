@@ -2,50 +2,39 @@ import 'package:emergencyrespo3712/Features/User/Screens/ZanecoOptions/zaneco_op
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-//import 'package:public_emergency_app/Features/User/Screens/AmbulanceOptions/AmbulanceOptions.dart';
-//import 'package:public_emergency_app/Features/User/Screens/FirefighterOptions/firefighter_options.dart';
-//import 'package:public_emergency_app/Features/User/Screens/HospitalOptions/hospital_options.dart';
-//import 'package:public_emergency_app/Features/User/Screens/PoliceOptions/police_options.dart';
 
 import '../AmbulanceOptions/AmbulanceOptions.dart';
 import '../FirefighterOptions/firefighter_options.dart';
-import '../HospitalOptions/hospital_options.dart';
 import '../PoliceOptions/police_options.dart';
 
 class GridDashboard extends StatelessWidget {
   Items item1 = Items(
       title: "Police Station",
-      subtitle: "Emergency Police ",
+      subtitle: "Emergency Police Services",
       event: "",
       img: "assets/logos/policeman.png");
 
   Items item2 = Items(
     title: "Fire Station",
-    subtitle: "Emergency Fire Brigade",
+    subtitle: "Emergency Fire Services",
     event: "",
     img: "assets/logos/fire-truck.png",
   );
 
   Items item3 = Items(
-    title: "Ambulance",
-    subtitle: "Emergency Ambulance",
+    title: "Medical Services",
+    subtitle: "Emergency Medical Services",
     event: "",
     img: "assets/logos/ambulance.png",
   );
   Items item4 = Items(
-    title: "Zaneco",
-    subtitle: "Emergency Zaneco",
+    title: "Utility Services",
+    subtitle: "Emergency Utility Services",
     event: "",
     img: "assets/logos/zaneco.png",
   );
 
   GridDashboard({super.key});
-  // Items item4 = new Items(
-  //   title: "To do",
-  //   subtitle: "Homework, Design",
-  //   event: "4 Items",s
-  //   img: "assets/logos/emergencyAppLogo.png",
-  // );
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +53,9 @@ class GridDashboard extends StatelessWidget {
                 Get.to(() => const PoliceOptions());
               } else if (data.title == "Fire Station") {
                 Get.to(() => const FireFighterOptions());
-              } else if (data.title == "Ambulance") {
+              } else if (data.title == "Medical Services") {
                 Get.to(() => const AmbulanceOptions());
-              } else if (data.title == "Zaneco") {
+              } else if (data.title == "Utility Services") {
                 Get.to(() => const ZanecoOptions());
               }
             },

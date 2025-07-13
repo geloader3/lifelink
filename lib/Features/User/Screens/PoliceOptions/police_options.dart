@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../Common Widgets/constants.dart';
 import '../../Controllers/message_sending.dart';
+import '../Announcements/announcements_screen.dart';
 import '../LiveStreaming/sos_page.dart';
 
 class PoliceOptions extends StatefulWidget {
@@ -78,6 +79,7 @@ class _PoliceOptionsState extends State<PoliceOptions> {
               image: const AssetImage("assets/logos/policeman.png"),
               height: Get.height * 0.10,
             ),
+            const SizedBox(height: 20),
             Card(
               child: ListTile(
                 shape: const RoundedRectangleBorder(
@@ -103,7 +105,6 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                     color: Colors.white,
                   ),
                 ),
-                // trailing: Icon(Icons.police),
                 onTap: () async {
                   Position position = await Geolocator.getCurrentPosition(
                       desiredAccuracy: LocationAccuracy.high);
@@ -131,7 +132,6 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                       throw 'Could not launch $url';
                     }
                   }
-                  // Add code here to display the nearest police station on the map
                 },
               ),
             ),
@@ -204,31 +204,33 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                     Radius.circular(15.0),
                   ),
                 ),
-                tileColor: const Color(0xfff85757),
+                tileColor: Color(color),
                 leading: const Icon(
-                  Icons.message,
-                  color: Colors.white,
+                  Icons.announcement,
+                  color: Colors.yellowAccent,
                 ),
                 title: const Text(
-                  'Send Distress Message',
+                  'View Announcements',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 subtitle: const Text(
-                  'Send a distress message to emergency contacts',
+                  'View current announcements and advisories',
                   style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
                 onTap: () {
-                  smsController
-                      .sendLocationViaSMS("Police Emergency\nSend Police at");
-                  // Add code here to send a distress message to emergency contacts
+                  Get.to(() => const AnnouncementsScreen(
+                    department: 'Police',
+                    departmentName: 'Police Department',
+                  ));
                 },
               ),
             ),
+            const SizedBox(height: 20),
             SizedBox(
               width: Get.width * 0.8,
               height: Get.height * 0.1,
@@ -246,12 +248,13 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                     builder: (BuildContext context) {
                       String userMessage = "";
                       File? selectedImage;
+                      File? selectedVideo;
                       final imagePicker = ImagePicker();
 
                       return StatefulBuilder(
                         builder: (context, setState) {
                           return AlertDialog(
-                            title: const Text("Enter a Message"),
+                            title: const Text("Report Police Emergency"),
                             content: SingleChildScrollView(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -261,8 +264,10 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                                       userMessage = value.trim();
                                     },
                                     decoration: const InputDecoration(
-                                      hintText: "Type your message here",
+                                      hintText: "Describe the emergency situation",
+                                      labelText: "Emergency Description",
                                     ),
+                                    maxLines: 3,
                                   ),
                                   const SizedBox(height: 16),
                                   if (selectedImage != null)
@@ -290,21 +295,75 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                                         ),
                                       ],
                                     ),
+                                  if (selectedVideo != null)
+                                    Stack(
+                                      alignment: Alignment.topRight,
+                                      children: [
+                                        Container(
+                                          height: 100,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(8),
+                                            color: Colors.grey[300],
+                                          ),
+                                          child: const Center(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.videocam, size: 40),
+                                                Text('Video Selected'),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.close, color: Colors.red),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedVideo = null;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   const SizedBox(height: 8),
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.attachment),
-                                    label: const Text("Attach Image"),
-                                    onPressed: () async {
-                                      final XFile? image = await imagePicker.pickImage(
-                                        source: ImageSource.gallery,
-                                        imageQuality: 70,
-                                      );
-                                      if (image != null) {
-                                        setState(() {
-                                          selectedImage = File(image.path);
-                                        });
-                                      }
-                                    },
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.image),
+                                          label: const Text("Add Image"),
+                                          onPressed: () async {
+                                            final XFile? image = await imagePicker.pickImage(
+                                              source: ImageSource.gallery,
+                                              imageQuality: 70,
+                                            );
+                                            if (image != null) {
+                                              setState(() {
+                                                selectedImage = File(image.path);
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.videocam),
+                                          label: const Text("Add Video"),
+                                          onPressed: () async {
+                                            final XFile? video = await imagePicker.pickVideo(
+                                              source: ImageSource.gallery,
+                                            );
+                                            if (video != null) {
+                                              setState(() {
+                                                selectedVideo = File(video.path);
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -317,11 +376,12 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                                 },
                               ),
                               TextButton(
-                                child: const Text("Submit"),
+                                child: const Text("Send Alert"),
                                 onPressed: () {
                                   Navigator.of(context).pop({
                                     'message': userMessage,
                                     'image': selectedImage,
+                                    'video': selectedVideo,
                                   });
                                 },
                               ),
@@ -333,17 +393,16 @@ class _PoliceOptionsState extends State<PoliceOptions> {
                   ).then((result) {
                     if (result != null && result['message'].isNotEmpty) {
                       saveCurrentLocation(result['message']).whenComplete(() {
-                        // jumpToLiveStream(sessionController.userid.toString(), true);
+                        smsController.sendLocationViaSMS("Police Emergency\nSend Police at");
                       });
                     } else {
-                      Get.snackbar("Message Required", "You must enter a message to proceed.");
+                      Get.snackbar("Description Required", "You must enter an emergency description to proceed.");
                     }
                   });
                 },
                 child: const Text("Send Alert", style: TextStyle(fontSize: 40)),
               ),
             ),
-
           ],
         ),
       ),

@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../Common Widgets/constants.dart';
 import '../../Controllers/message_sending.dart';
+import '../Announcements/announcements_screen.dart';
 import '../LiveStreaming/sos_page.dart';
 
 class ZanecoOptions extends StatelessWidget {
@@ -73,6 +74,7 @@ class ZanecoOptions extends StatelessWidget {
               image: const AssetImage("assets/logos/zaneco.png"),
               height: Get.height * 0.10,
             ),
+            const SizedBox(height: 20),
             Card(
               child: ListTile(
                 shape: const RoundedRectangleBorder(
@@ -86,7 +88,6 @@ class ZanecoOptions extends StatelessWidget {
                     style: TextStyle(color: Colors.white)),
                 subtitle: const Text('Find the nearest Zaneco on the map',
                     style: TextStyle(color: Colors.white)),
-                // trailing: Icon(Icons.police),
                 onTap: () async {
                   Position position = await Geolocator.getCurrentPosition(
                       desiredAccuracy: LocationAccuracy.high);
@@ -112,7 +113,6 @@ class ZanecoOptions extends StatelessWidget {
                       throw 'Could not launch $url';
                     }
                   }
-                  // Add code here to display the nearest police station on the map
                 },
               ),
             ),
@@ -167,26 +167,29 @@ class ZanecoOptions extends StatelessWidget {
                 },
               ),
             ),
-            // Card(
-            //   child: ListTile(
-            //     shape: const RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.all(
-            //         Radius.circular(15.0),
-            //       ),
-            //     ),
-            //     tileColor: const Color(0xfff85757),
-            //     leading: const Icon(Icons.message, color: Colors.white),
-            //     title: const Text('Send Distress Message',
-            //         style: TextStyle(color: Colors.white)),
-            //     subtitle:
-            //     const Text('Send a distress message to emergency contacts',
-            //         style: TextStyle(color: Colors.white)),
-            //     onTap: () {
-            //       smsController.sendLocationViaSMS("Electric Emergency\nSend at");
-            //       // Add code here to send a distress message to emergency contacts
-            //     },
-            //   ),
-            // ),
+            Card(
+              child: ListTile(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(15.0),
+                  ),
+                ),
+                tileColor: Color(color),
+                leading: const Icon(Icons.announcement, color: Colors.yellowAccent),
+                title: const Text('View Announcements',
+                    style: TextStyle(color: Colors.white)),
+                subtitle:
+                const Text('View current announcements and advisories',
+                    style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Get.to(() => const AnnouncementsScreen(
+                    department: 'Zaneco',
+                    departmentName: 'Utility Services',
+                  ));
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
             SizedBox(
               width: Get.width * 0.8,
               height: Get.height * 0.1,
@@ -204,12 +207,13 @@ class ZanecoOptions extends StatelessWidget {
                     builder: (BuildContext context) {
                       String userMessage = "";
                       File? selectedImage;
+                      File? selectedVideo;
                       final imagePicker = ImagePicker();
 
                       return StatefulBuilder(
                         builder: (context, setState) {
                           return AlertDialog(
-                            title: const Text("Enter a Message"),
+                            title: const Text("Report Utility Emergency"),
                             content: SingleChildScrollView(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
@@ -219,8 +223,10 @@ class ZanecoOptions extends StatelessWidget {
                                       userMessage = value.trim();
                                     },
                                     decoration: const InputDecoration(
-                                      hintText: "Type your message here",
+                                      hintText: "Describe the utility emergency",
+                                      labelText: "Emergency Description",
                                     ),
+                                    maxLines: 3,
                                   ),
                                   const SizedBox(height: 16),
                                   if (selectedImage != null)
@@ -248,21 +254,75 @@ class ZanecoOptions extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                  if (selectedVideo != null)
+                                    Stack(
+                                      alignment: Alignment.topRight,
+                                      children: [
+                                        Container(
+                                          height: 100,
+                                          width: double.infinity,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(8),
+                                            color: Colors.grey[300],
+                                          ),
+                                          child: const Center(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.videocam, size: 40),
+                                                Text('Video Selected'),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.close, color: Colors.red),
+                                          onPressed: () {
+                                            setState(() {
+                                              selectedVideo = null;
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   const SizedBox(height: 8),
-                                  ElevatedButton.icon(
-                                    icon: const Icon(Icons.attachment),
-                                    label: const Text("Attach Image"),
-                                    onPressed: () async {
-                                      final XFile? image = await imagePicker.pickImage(
-                                        source: ImageSource.gallery,
-                                        imageQuality: 70,
-                                      );
-                                      if (image != null) {
-                                        setState(() {
-                                          selectedImage = File(image.path);
-                                        });
-                                      }
-                                    },
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.image),
+                                          label: const Text("Add Image"),
+                                          onPressed: () async {
+                                            final XFile? image = await imagePicker.pickImage(
+                                              source: ImageSource.gallery,
+                                              imageQuality: 70,
+                                            );
+                                            if (image != null) {
+                                              setState(() {
+                                                selectedImage = File(image.path);
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.videocam),
+                                          label: const Text("Add Video"),
+                                          onPressed: () async {
+                                            final XFile? video = await imagePicker.pickVideo(
+                                              source: ImageSource.gallery,
+                                            );
+                                            if (video != null) {
+                                              setState(() {
+                                                selectedVideo = File(video.path);
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -275,11 +335,12 @@ class ZanecoOptions extends StatelessWidget {
                                 },
                               ),
                               TextButton(
-                                child: const Text("Submit"),
+                                child: const Text("Send Alert"),
                                 onPressed: () {
                                   Navigator.of(context).pop({
                                     'message': userMessage,
                                     'image': selectedImage,
+                                    'video': selectedVideo,
                                   });
                                 },
                               ),
@@ -291,10 +352,10 @@ class ZanecoOptions extends StatelessWidget {
                   ).then((result) {
                     if (result != null && result['message'].isNotEmpty) {
                       saveCurrentLocation(result['message']).whenComplete(() {
-                        // jumpToLiveStream(sessionController.userid.toString(), true);
+                        smsController.sendLocationViaSMS("Utility Emergency\nSend Help at");
                       });
                     } else {
-                      Get.snackbar("Message Required", "You must enter a message to proceed.");
+                      Get.snackbar("Description Required", "You must enter an emergency description to proceed.");
                     }
                   });
                 },
